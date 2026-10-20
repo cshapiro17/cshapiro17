@@ -1,0 +1,71 @@
+# Daily research newsletter configuration.
+# Edit this file to change topics, sources, or how many papers make the cut.
+
+[newsletter]
+title = "Mechanical Engineering & Robotics Research Daily"
+# Papers older than this are ignored. arXiv announces in batches and skips
+# weekends, so a few days of overlap is fine: already-sent papers are skipped.
+lookback_days = 4
+# How many papers get a full write-up; the next tier gets a one-line mention.
+featured_count = 8
+also_noteworthy_count = 12
+# Upper bound on candidates sent to Claude per run (most recent first).
+max_candidates = 400
+# Abstracts are trimmed to this many characters to keep each run inexpensive.
+max_abstract_chars = 1500
+
+# What the reader cares about. Claude uses this to rank and filter papers.
+interests = """
+Mechanical engineering and robotics, with emphasis on:
+- Robot manipulation, grasping, dexterous hands, and legged/humanoid locomotion
+- Soft robotics, compliant mechanisms, actuators, and novel mechanism design
+- Control systems, motion planning, state estimation, and robot learning that
+  is validated on real hardware
+- Solid mechanics, structural dynamics, vibration, fatigue, and fracture
+- Fluid mechanics and heat transfer with engineering applications
+- Manufacturing, additive manufacturing, and metamaterials
+- Mechatronics, sensors, and design optimization
+Prefer papers with physical experiments, open-source hardware or code, or
+results a practicing engineer could apply. Deprioritize purely theoretical
+ML papers with only a tangential robotics angle.
+"""
+
+[claude]
+model = "claude-opus-5-5"
+effort = "medium"
+
+# arXiv categories to pull. https://arxiv.org/category_taxonomy
+[arxiv]
+categories = [
+  "cs.RO",          # Robotics
+  "eess.SY",        # Systems and Control
+  "physics.app-ph", # Applied Physics
+  "physics.flu-dyn",# Fluid Dynamics
+  "physics.class-ph", # Classical Physics (mechanics)
+]
+max_results_per_category = 200
+
+# Journal RSS/Atom feeds. A feed that fails to load is skipped with a warning.
+[[feeds]]
+name = "Science Robotics"
+url = "https://www.science.org/action/showFeed?type=etoc&feed=rss&jc=scirobotics"
+
+[[feeds]]
+name = "IEEE Robotics and Automation Letters"
+url = "https://ieeexplore.ieee.org/rss/TOC7083369.XML"
+
+[[feeds]]
+name = "Mechanism and Machine Theory"
+url = "https://rss.sciencedirect.com/publication/science/0094114X"
+
+[[feeds]]
+name = "Mechanical Systems and Signal Processing"
+url = "https://rss.sciencedirect.com/publication/science/08883270"
+
+[[feeds]]
+name = "Journal of the Mechanics and Physics of Solids"
+url = "https://rss.sciencedirect.com/publication/science/00225096"
+
+[[feeds]]
+name = "International Journal of Mechanical Sciences"
+url = "https://rss.sciencedirect.com/publication/science/00207403"

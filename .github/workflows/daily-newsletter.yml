@@ -1,0 +1,55 @@
+name: Daily research newsletter
+
+on:
+  schedule:
+    # 10:47 UTC every day (about 6:47 AM US Eastern, 3:47 AM Pacific).
+    # GitHub cron is always UTC; edit this line to change the delivery time.
+    - cron: "47 10 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: daily-newsletter
+  cancel-in-progress: false
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: newsletter/requirements.txt
+
+      - run: pip install -r newsletter/requirements.txt
+
+      # History of papers already sent, so the same paper is never sent twice.
+      - name: Restore sent-paper history
+        uses: actions/cache/restore@v4
+        with:
+          path: newsletter/state
+          key: newsletter-state-${{ github.run_id }}
+          restore-keys: newsletter-state-
+
+      - name: Build and send newsletter
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          NEWSLETTER_TO: ${{ secrets.NEWSLETTER_TO }}
+          SMTP_HOST: ${{ vars.SMTP_HOST }}
+          SMTP_PORT: ${{ vars.SMTP_PORT }}
+        run: python newsletter/main.py
+
+      - name: Save sent-paper history
+        if: success()
+        uses: actions/cache/save@v4
+        with:
+          path: newsletter/state
+          key: newsletter-state-${{ github.run_id }}
